@@ -1,0 +1,19 @@
+{
+	"name": "OutputTransformedData",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "adls2adf_ls",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"folderPath": "bronze",
+				"fileSystem": "denis"
+			}
+		},
+		"schema": {}
+	}
+}
