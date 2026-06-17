@@ -1,0 +1,101 @@
+trigger:
+  branches:
+    include:
+      - main
+
+pool:
+  name: SelfPool
+
+stages:
+
+# ============================================
+# STAGE 1: Build
+# ============================================
+- stage: Build
+  displayName: "Build Stage"
+
+  jobs:
+  - job: PublishRepo
+    displayName: "Checkout Repo"
+    steps:
+
+    - checkout: self
+
+    - script: |
+        echo "===== FILES IN REPO ROOT ====="
+        dir "$(Build.SourcesDirectory)"
+      displayName: "DEBUG: List Root Files"
+
+
+# ============================================
+# STAGE 2: Deploy to UAT
+# ============================================
+- stage: Deploy_UAT
+  displayName: "Deploy to UAT"
+  dependsOn: Build
+
+  jobs:
+  - job: DeployADF_UAT
+    displayName: "Deploy ARM to UAT ADF"
+
+    steps:
+    - checkout: self
+
+    - task: AzureResourceGroupDeployment@2
+      displayName: "Deploy ARM Template to UAT Data Factory"
+      inputs:
+        azureSubscription: "SJ KSR Datavizon Subscription"
+        action: "Create Or Update Resource Group"
+        resourceGroupName: "mde-azure-rg"
+        location: "East US"
+
+        templateLocation: "Linked artifact"
+        csmFile: "$(Build.SourcesDirectory)/ARMTemplateForFactory.json"
+        csmParametersFile: "$(Build.SourcesDirectory)/ARMTemplateParametersForFactory.json"
+
+        overrideParameters: >
+          -factoryName "denisuatadf"
+          -LS_ADLS_accountName "denisstguat"
+          -LS_ADLS_fileSystem "denis"
+          -adls2adf_ls_accountKey "$(uat_adls_account_key)"
+          -adls2adf_ls_properties_typeProperties_url "https://denisstguat.dfs.core.windows.net/"
+
+
+        deploymentMode: Incremental
+
+
+# ============================================
+# STAGE 3: Deploy to PROD
+# ============================================
+- stage: Deploy_PROD
+  displayName: "Deploy to PROD"
+  dependsOn: Deploy_UAT
+
+  jobs:
+  - job: DeployADF_PROD
+    displayName: "Deploy ARM to PROD ADF"
+
+    steps:
+    - checkout: self
+
+    - task: AzureResourceGroupDeployment@2
+      displayName: "Deploy ARM Template to PROD Data Factory"
+      inputs:
+        azureSubscription: "SJ KSR Datavizon Subscription"
+        action: "Create Or Update Resource Group"
+        resourceGroupName: "mde-azure-rg"
+        location: "East US"
+
+        templateLocation: "Linked artifact"
+        csmFile: "$(Build.SourcesDirectory)/ARMTemplateForFactory.json"
+        csmParametersFile: "$(Build.SourcesDirectory)/ARMTemplateParametersForFactory.json"
+
+        overrideParameters: >
+          -factoryName "denisprodadf"
+          -LS_ADLS_accountName "denisstgprod"
+          -LS_ADLS_fileSystem "denis"
+          -adls2adf_ls_accountKey "$(prod_adls_account_key)"
+          -adls2adf_ls_properties_typeProperties_url "https://denisstgprod.dfs.core.windows.net/"
+
+
+        deploymentMode: Incremental
