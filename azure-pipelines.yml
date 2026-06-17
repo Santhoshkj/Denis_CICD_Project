@@ -56,8 +56,6 @@ stages:
 
         overrideParameters: >
           -factoryName "denisuatadf"
-          -LS_ADLS_accountName "denisstguat"
-          -LS_ADLS_fileSystem "denis"
           -adls2adf_ls_accountKey "$(uat_adls_account_key)"
           -adls2adf_ls_properties_typeProperties_url "https://denisstguat.dfs.core.windows.net/"
 
@@ -93,8 +91,6 @@ stages:
 
         overrideParameters: >
           -factoryName "denisprodadf"
-          -LS_ADLS_accountName "denisstgprod"
-          -LS_ADLS_fileSystem "denis"
           -adls2adf_ls_accountKey "$(prod_adls_account_key)"
           -adls2adf_ls_properties_typeProperties_url "https://denisstgprod.dfs.core.windows.net/"
 
