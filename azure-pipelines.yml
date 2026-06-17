@@ -45,7 +45,7 @@ stages:
     - task: AzureResourceGroupDeployment@2
       displayName: "Deploy ARM Template to UAT Data Factory"
       inputs:
-        azureSubscription: "SJ KSR Datavizon Subscription"
+        azureSubscription: "devopsConnection"
         action: "Create Or Update Resource Group"
         resourceGroupName: "mde-azure-rg"
         location: "East US"
@@ -82,7 +82,7 @@ stages:
     - task: AzureResourceGroupDeployment@2
       displayName: "Deploy ARM Template to PROD Data Factory"
       inputs:
-        azureSubscription: "SJ KSR Datavizon Subscription"
+        azureSubscription: "devopsConnection"
         action: "Create Or Update Resource Group"
         resourceGroupName: "mde-azure-rg"
         location: "East US"
